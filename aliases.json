@@ -1,0 +1,119 @@
+{
+    "relations":  {
+                      "俗称":  [
+                                 "简称",
+                                 "别称",
+                                 "也叫"
+                             ],
+                      "解锁":  [
+                                 "开启",
+                                 "获得",
+                                 "开放"
+                             ],
+                      "需要":  [
+                                 "要求",
+                                 "必须",
+                                 "需"
+                             ],
+                      "位于":  [
+                                 "在",
+                                 "处于",
+                                 "放置于"
+                             ],
+                      "包含":  [
+                                 "包括",
+                                 "有",
+                                 "拥有"
+                             ]
+                  },
+    "entities":  {
+                     "长条":  [
+                                "hold",
+                                "Hold",
+                                "长音符"
+                            ],
+                     "Beyond":  [
+                                    "BYD",
+                                    "byd",
+                                    "Beyond难度"
+                                ],
+                     "音弧":  [
+                                "蛇",
+                                "arc",
+                                "Arc",
+                                "ARC"
+                            ],
+                     "世界模式":  [
+                                  "World Mode",
+                                  "world mode",
+                                  "爬梯"
+                              ],
+                     "异象":  [
+                                "Anomaly",
+                                "anomaly",
+                                "特殊游玩效果"
+                            ],
+                     "Eternal":  [
+                                     "ETR",
+                                     "etr",
+                                     "Eternal难度"
+                                 ],
+                     "对立":  [
+                                "Tairitsu",
+                                "tairitsu",
+                                "黑姬"
+                            ],
+                     "天键":  [
+                                "arctap",
+                                "Arctap",
+                                "天空音符",
+                                "天空物件"
+                            ],
+                     "残片":  [
+                                "fragment",
+                                "Fragment"
+                            ],
+                     "光":  [
+                               "Hikari",
+                               "hikari",
+                               "白姬"
+                           ],
+                     "Past":  [
+                                  "PST",
+                                  "pst",
+                                  "Past难度"
+                              ],
+                     "潜力值":  [
+                                 "ptt",
+                                 "PTT",
+                                 "Potential"
+                             ],
+                     "回忆率":  [
+                                 "recall",
+                                 "Recall",
+                                 "回忆收集条"
+                             ],
+                     "Present":  [
+                                     "PRS",
+                                     "prs",
+                                     "Present难度"
+                                 ],
+                     "黑线":  [
+                                "trace",
+                                "Trace",
+                                "音轨"
+                            ],
+                     "地键":  [
+                                "tap",
+                                "Tap",
+                                "TAP",
+                                "地面音符",
+                                "地面物件"
+                            ],
+                     "Future":  [
+                                    "FTR",
+                                    "ftr",
+                                    "Future难度"
+                                ]
+                 }
+}

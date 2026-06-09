@@ -16,6 +16,61 @@ arcaea-knowledge-skill/
 └── query.py              # 查询脚本
 ```
 
+## 安装方法
+
+### 作为 AstrBot Skill 安装
+
+```bash
+git clone https://github.com/Blueteemo/arcaea-knowledge-skill.git
+# 将 arcaea-knowledge-skill 目录放到 AstrBot 的 skills 目录下
+# 重启 AstrBot 即可自动加载
+```
+
+### 依赖安装
+
+```bash
+pip install -r requirements.txt
+# 或手动安装所需依赖
+```
+
+## 功能特性
+
+### 🎮 歌曲查询
+- 按曲名、艺术家、分类、别名查询曲目信息
+- 查询难度定数、谱面类型（PST/PRS/FTR/ETR/BYD）
+- 别名智能映射（"绿魔王"→"Cyaegha"）
+
+### 🎭 剧情检索
+- 按角色（光、对立、忘却、彩梦等）检索剧情
+- 按章节（主线、支线、角色故事）浏览
+- 全文搜索剧情对话
+
+### ⚙️ 机制查询
+- 查询游戏系统（音弧、地键、天键、长条等）
+- 查询潜力值（ptt）计算规则
+- 查询世界模式、异象触发条件等
+
+### 🔍 别名搜索
+- 支持自然别名的自动映射
+- 如"蛇"→"音弧"、"ptt"→"潜力值"
+
+## 使用示例
+
+群聊问法：
+- "绿魔王是什么歌？"
+- "光和对立的剧情介绍一下"
+- "Beyond难度是什么意思"
+- "音弧的判定规则是什么"
+- "蛇是什么机制"
+- "潜力值怎么算的"
+
+命令行查询：
+
+```bash
+# 查看可用索引
+python query.py --list-indexes
+...
+
 ## 知识库架构
 
 ### 双索引设计

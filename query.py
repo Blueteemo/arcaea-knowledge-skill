@@ -6,12 +6,6 @@ import json
 import argparse
 import sys
 import os
-import io
-import re
-from collections import defaultdict
-
-# 设置 stdout 编码
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # 索引配置
 INDEXES = {
@@ -49,14 +43,14 @@ def load_aliases():
         _ALIASES = {"entities": {}, "relations": {}}
     return _ALIASES
 
-def expand_entity(entity):
+def expand_entity(entity, kind='entities'):
     """扩展实体别名，返回所有可能的匹配形式"""
     aliases = load_aliases()
     entity_lower = entity.lower()
     variants = {entity, entity_lower}
     
     # 检查是否是某个标准实体的别名
-    for standard, alias_list in aliases.get('entities', {}).items():
+    for standard, alias_list in aliases.get(kind, {}).items():
         if entity_lower == standard.lower() or entity_lower in [a.lower() for a in alias_list]:
             variants.add(standard)
             variants.update(alias_list)
@@ -74,11 +68,15 @@ def load_kb(index='mechanic'):
 
 def search_by_category(kb, category, limit=10):
     """按分类搜索"""
+    if limit <= 0 or not category.strip():
+        return []
     results = [d for d in kb['docs'] if d.get('category') == category]
     return results[:limit]
 
 def search_by_chapter(kb, chapter, limit=10):
     """按章节搜索（剧情库）"""
+    if limit <= 0 or not chapter.strip():
+        return []
     results = []
     chapter_lower = chapter.lower()
     for doc in kb['docs']:
@@ -91,17 +89,17 @@ def search_by_chapter(kb, chapter, limit=10):
 
 def search_by_entity(kb, entity, limit=10):
     """按实体搜索（支持别名）"""
+    if limit <= 0 or not entity.strip():
+        return []
     results = []
-    variants = expand_entity(entity)
+    variants = {v.lower() for v in expand_entity(entity)}
     
     for doc in kb['docs']:
         entities = doc.get('extracted_entities', [])
         for e in entities:
             e_lower = e.lower()
-            # 精确匹配：实体名完全等于某个变体，或变体完全包含在实体中
-            if any(v.lower() == e_lower or 
-                   (len(v) >= 2 and v.lower() in e_lower and e_lower in [v2.lower() for v2 in variants]) 
-                   for v in variants):
+            # 实体搜索采用精确别名匹配；模糊匹配请使用 smart_search。
+            if e_lower in variants:
                 results.append(doc)
                 break
         if len(results) >= limit:
@@ -110,6 +108,8 @@ def search_by_entity(kb, entity, limit=10):
 
 def search_by_keyword(kb, keyword, limit=10):
     """关键词全文搜索"""
+    if limit <= 0 or not keyword.strip():
+        return []
     results = []
     keyword_lower = keyword.lower()
     for doc in kb['docs']:
@@ -122,9 +122,11 @@ def search_by_keyword(kb, keyword, limit=10):
 
 def search_by_triple(kb, subject=None, predicate=None, object_=None, limit=10):
     """按三元组搜索"""
+    if limit <= 0 or not any(v and v.strip() for v in (subject, predicate, object_)):
+        return []
     results = []
     subj_variants = expand_entity(subject) if subject else None
-    pred_variants = expand_entity(predicate) if predicate else None
+    pred_variants = expand_entity(predicate, 'relations') if predicate else None
     obj_variants = expand_entity(object_) if object_ else None
     
     for doc in kb['docs']:
@@ -150,9 +152,12 @@ def search_by_triple(kb, subject=None, predicate=None, object_=None, limit=10):
 
 def smart_search(kb, query, limit=10):
     """智能搜索：同时匹配实体、关键词、章节"""
+    if limit <= 0 or not query.strip():
+        return []
     results = []
     query_lower = query.lower()
-    scores = defaultdict(float)
+    scores = {}
+    variants = {v.lower() for v in expand_entity(query)}
     
     for doc in kb['docs']:
         score = 0
@@ -167,9 +172,8 @@ def smart_search(kb, query, limit=10):
         
         # 实体匹配
         entities = [e.lower() for e in doc.get('extracted_entities', [])]
-        variants = expand_entity(query)
         for e in entities:
-            if any(v.lower() in e for v in variants):
+            if any(v in e for v in variants):
                 score += 20
         
         # 章节匹配（剧情库）
@@ -181,8 +185,6 @@ def smart_search(kb, query, limit=10):
             scores[doc['idx']] = score
             results.append(doc)
         
-        if len(results) >= limit * 3:  # 多取一些用于排序
-            break
     
     # 按分数排序
     results.sort(key=lambda d: scores.get(d['idx'], 0), reverse=True)
@@ -208,6 +210,9 @@ def format_result(doc, max_length=200):
 """
 
 def main():
+    # 只在命令行入口配置输出；导入 Python API 时不改动调用方 stdout。
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
     parser = argparse.ArgumentParser(
         description='Arcaea 知识库查询工具 (双索引+别名+章节)',
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -250,6 +255,8 @@ def main():
     parser.add_argument('--list-aliases', action='store_true', help='列出实体别名')
     
     args = parser.parse_args()
+    if args.limit <= 0:
+        parser.error('--limit 必须为正整数')
     
     if args.list_indexes:
         print("=== 可用索引 ===")
